@@ -24,6 +24,26 @@ public struct Scraper {
         return .init(applications: feed.content.entry ?? [])
     }
 
+    public func searchApplications(
+        _ term: String,
+        country: Country = .US,
+        limit: Int = 10
+    ) async throws -> [Application] {
+        let encodedTerm = term.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? term
+        let url = "\(baseURL)/search?term=\(encodedTerm)&country=\(country.rawValue.lowercased())&limit=\(limit)&entity=software"
+        let result: SearchResult = try await get(url)
+        return result.applications
+    }
+
+    public func getApplication(
+        _ id: Int,
+        country: Country = .US
+    ) async throws -> Application? {
+        let url = "\(baseURL)/\(country.rawValue.lowercased())/lookup?id=\(id)"
+        let result: SearchResult = try await get(url)
+        return result.applications.first
+    }
+
     // MARK: - Private
 
     private let baseURL = "https://itunes.apple.com"
@@ -61,6 +81,14 @@ public struct Scraper {
 
         struct Entries: Codable {
             let entry: [Ranking.Application]?
+        }
+    }
+
+    private struct SearchResult: Codable {
+        let applications: [Application]
+
+        enum CodingKeys: String, CodingKey {
+            case applications = "results"
         }
     }
 }
