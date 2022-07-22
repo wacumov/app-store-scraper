@@ -9,15 +9,17 @@ public struct Scraper {
     public func getRanking(
         _ rankingType: RankingType,
         country: Country = .US,
-        category: Category? = nil,
+        categoryFilter: CategoryFilter = .allApps,
         limit: Int = 10
     ) async throws -> Ranking {
         let feedTitle = makeFeedTitle(rankingType)
         let genre: String = {
-            guard let category = category else {
+            switch categoryFilter {
+            case .allApps:
                 return ""
+            case let .category(category):
+                return "genre=\(category.rawValue)/"
             }
-            return "genre=\(category.rawValue)/"
         }()
         let url = "\(baseURL)/rss/\(feedTitle)/\(genre)limit=\(limit)/json?cc=\(country.rawValue.lowercased())"
         let feed: Feed = try await get(url)
