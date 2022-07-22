@@ -1,4 +1,4 @@
-public enum RankingType: String {
+public enum RankingType: String, CaseIterable {
     case topFree, topFreeIpad, topFreeMac
     case topPaid, topPaidIpad, topPaidMac
     case topGrossing, topGrossingIpad
