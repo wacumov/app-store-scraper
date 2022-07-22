@@ -1,3 +1,5 @@
+import Foundation
+
 public enum Country: String, Codable, CaseIterable {
     case AE, AF, AG, AI, AL, AM, AO, AR, AT, AU, AZ
     case BA, BB, BE, BF, BG, BH, BJ, BM, BN, BO, BR, BS, BT, BW, BY, BZ
@@ -24,4 +26,16 @@ public enum Country: String, Codable, CaseIterable {
     case XK
     case YE
     case ZA, ZM, ZW
+
+    public var name: String {
+        let code = rawValue.lowercased()
+        let locale = Locale(identifier: "en_US")
+        let id = NSLocale.localeIdentifier(fromComponents: [
+            NSLocale.Key.countryCode.rawValue: code,
+        ])
+        return (locale as NSLocale).displayName(
+            forKey: .identifier,
+            value: id
+        ) ?? rawValue
+    }
 }
