@@ -10,7 +10,7 @@ final class ScraperTests: XCTestCase {
 
     func testSearchApplications() async throws {
         let scraper = Scraper()
-        let applications = try await scraper.searchApplications("pros and cons")
+        let applications = try await scraper.searchApplications("pros and cons", language: .zh_Hans)
         XCTAssertFalse(applications.isEmpty)
     }
 

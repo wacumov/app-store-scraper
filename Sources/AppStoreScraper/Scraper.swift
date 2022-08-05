@@ -29,19 +29,23 @@ public struct Scraper {
     public func searchApplications(
         _ term: String,
         country: Country = .US,
+        language: Language? = nil,
         limit: Int = 10
     ) async throws -> [Application] {
         let encodedTerm = term.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? term
-        let url = "\(baseURL)/search?term=\(encodedTerm)&country=\(country.rawValue.lowercased())&limit=\(limit)&entity=software"
+        let language = makeLanguage(language, country: country)
+        let url = "\(baseURL)/search?term=\(encodedTerm)&country=\(country.rawValue.lowercased())&limit=\(limit)&entity=software\(language)"
         let result: SearchResult = try await get(url)
         return result.applications
     }
 
     public func getApplication(
         _ id: Int,
-        country: Country = .US
+        country: Country = .US,
+        language: Language? = nil
     ) async throws -> Application? {
-        let url = "\(baseURL)/\(country.rawValue.lowercased())/lookup?id=\(id)"
+        let language = makeLanguage(language, country: country)
+        let url = "\(baseURL)/\(country.rawValue.lowercased())/lookup?id=\(id)\(language)"
         let result: SearchResult = try await get(url)
         return result.applications.first
     }
@@ -72,6 +76,26 @@ public struct Scraper {
             }
         }()
         return [rankingType.rawValue.lowercased(), suffix].joined()
+    }
+
+    private func makeLanguage(_ language: Language?, country: Country) -> String {
+        guard let language = language else {
+            return ""
+        }
+        let supported = country.languages
+        guard
+            language != supported.main,
+            supported.additional.contains(language)
+        else {
+            return ""
+        }
+        let code: String = {
+            switch language {
+            case .zh_Hans: return "zh_CN"
+            default: return String(language.rawValue.prefix(2))
+            }
+        }()
+        return "&lang=\(code)"
     }
 
     private struct Feed: Codable {
