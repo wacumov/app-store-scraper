@@ -18,6 +18,8 @@ public enum Category: Int, Codable, CaseIterable {
     case entertainment = 6016
     case education = 6017
     case books = 6018
+    case medical = 6020
+    case magazinesAndNewspapers = 6021
     case foodAndDrink = 6023
     case shopping = 6024
     case developerTools = 6026
@@ -44,6 +46,8 @@ public enum Category: Int, Codable, CaseIterable {
         case .entertainment: return "Entertainment"
         case .education: return "Education"
         case .books: return "Books"
+        case .medical: return "Medical"
+        case .magazinesAndNewspapers: return "Magazines & Newspapers"
         case .foodAndDrink: return "Food & Drink"
         case .shopping: return "Shopping"
         case .developerTools: return "Developer Tools"
