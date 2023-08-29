@@ -19,6 +19,8 @@ public struct Scraper {
                 return ""
             case let .category(category):
                 return "genre=\(category.rawValue)/"
+            case let .gamesSubcategory(subcategory):
+                return "genre=\(subcategory.rawValue)/"
             }
         }()
         let url = "\(baseURL)/rss/\(feedTitle)/\(genre)limit=\(limit)/json?cc=\(country.rawValue.lowercased())"
@@ -79,7 +81,7 @@ public struct Scraper {
     }
 
     private func makeLanguage(_ language: Language?, country: Country) -> String {
-        guard let language = language else {
+        guard let language else {
             return ""
         }
         let supported = country.languages
@@ -132,7 +134,7 @@ private extension URLSession {
             operation: {
                 try await withCheckedThrowingContinuation { continuation in
                     dataTask = self.dataTask(with: request) { data, _, error in
-                        guard let data = data else {
+                        guard let data else {
                             let error = error ?? URLError(.badServerResponse)
                             return continuation.resume(throwing: error)
                         }
