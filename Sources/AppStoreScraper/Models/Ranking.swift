@@ -8,7 +8,7 @@ public struct Ranking: Codable {
         public let developer: Developer
         public let releaseDate: ReleaseDate
         public let summary: Summary?
-        public let rights: Rights
+        public let rights: Rights?
         public let id: ID
         public let category: Category
 
