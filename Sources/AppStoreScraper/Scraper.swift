@@ -25,7 +25,7 @@ public struct Scraper {
         }()
         let url = "\(baseURL)/rss/\(feedTitle)/\(genre)limit=\(limit)/json?cc=\(country.rawValue.lowercased())"
         let feed: Feed = try await get(url)
-        return .init(applications: feed.content.entry ?? [])
+        return .init(applications: feed.content.entry?.toArray ?? [])
     }
 
     public func searchApplications(
@@ -100,15 +100,15 @@ public struct Scraper {
         return "&lang=\(code)"
     }
 
-    private struct Feed: Codable {
+    private struct Feed: Decodable {
         let content: Entries
 
         enum CodingKeys: String, CodingKey {
             case content = "feed"
         }
 
-        struct Entries: Codable {
-            let entry: [Ranking.Application]?
+        struct Entries: Decodable {
+            let entry: OneOrMany<Ranking.Application>?
         }
     }
 
@@ -117,6 +117,29 @@ public struct Scraper {
 
         enum CodingKeys: String, CodingKey {
             case applications = "results"
+        }
+    }
+}
+
+private enum OneOrMany<T: Decodable>: Decodable {
+    case one(T)
+    case many([T])
+
+    var toArray: [T] {
+        switch self {
+        case let .one(item): return [item]
+        case let .many(items): return items
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let many = try? container.decode([T].self) {
+            self = .many(many)
+        } else if let one = try? container.decode(T.self) {
+            self = .one(one)
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode \(OneOrMany.self)")
         }
     }
 }
