@@ -28,14 +28,7 @@ public enum Country: String, Codable, CaseIterable {
     case ZA, ZM, ZW
 
     public var name: String {
-        let code = rawValue.lowercased()
         let locale = Locale(identifier: "en_US")
-        let id = NSLocale.localeIdentifier(fromComponents: [
-            NSLocale.Key.countryCode.rawValue: code,
-        ])
-        return (locale as NSLocale).displayName(
-            forKey: .identifier,
-            value: id
-        ) ?? rawValue
+        return locale.localizedString(forRegionCode: rawValue) ?? rawValue
     }
 }
