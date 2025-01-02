@@ -46,7 +46,7 @@ public extension Country {
         case .SR: return (main: .en_GB, additional: [.nl_NL])
         case .TH: return (main: .en_GB, additional: [.th])
         case .UA: return (main: .en_GB, additional: [.ru, .uk])
-        case .US: return (main: .en_US, additional: [.ar_SA, .es_MX, .ru, .zh_Hans])
+        case .US: return (main: .en_US, additional: [.ar_SA, .es_MX, .fr_FR, .ko, .pt_BR, .ru, .vi, .zh_Hans, .zh_Hant])
         case .UY: return (main: .en_GB, additional: [.es_MX])
         case .VN: return (main: .en_GB, additional: [.vi])
         }
