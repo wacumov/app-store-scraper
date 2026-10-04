@@ -52,20 +52,47 @@ public struct Scraper {
         return result.applications.first
     }
 
+    /// Returns App Store search autocomplete suggestions for a term, in the order the store shows them.
+    public func getSearchHints(
+        _ term: String,
+        country: Country = .US
+    ) async throws -> [String] {
+        guard let storefrontId = country.storefrontId else {
+            throw UnsupportedCountry(country: country)
+        }
+        let encodedTerm = term.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? term
+        let url = "\(hintsURL)?clientApplication=Software&term=\(encodedTerm)"
+        let data = try await getData(url, headers: ["X-Apple-Store-Front": String(storefrontId)])
+        let result = try PropertyListDecoder().decode(HintsResult.self, from: data)
+        return result.hints.map(\.term)
+    }
+
+    public struct UnsupportedCountry: Error {
+        public let country: Country
+    }
+
     // MARK: - Private
 
     private let baseURL = "https://itunes.apple.com"
+    private let hintsURL = "https://search.itunes.apple.com/WebObjects/MZSearchHints.woa/wa/hints"
     private let session = URLSession.shared
     private let decoder = JSONDecoder()
 
     private func get<T: Decodable>(_ url: String) async throws -> T {
+        let data = try await getData(url)
+        return try decoder.decode(T.self, from: data)
+    }
+
+    private func getData(_ url: String, headers: [String: String] = [:]) async throws -> Data {
         guard let url = URL(string: url) else {
             throw URLError(.badURL)
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        let data = try await session.data(for: request)
-        return try decoder.decode(T.self, from: data)
+        for (field, value) in headers {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
+        return try await session.data(for: request)
     }
 
     private func makeFeedTitle(_ rankingType: RankingType) -> String {
@@ -109,6 +136,14 @@ public struct Scraper {
 
         struct Entries: Decodable {
             let entry: OneOrMany<Ranking.Application>?
+        }
+    }
+
+    private struct HintsResult: Decodable {
+        let hints: [Hint]
+
+        struct Hint: Decodable {
+            let term: String
         }
     }
 
