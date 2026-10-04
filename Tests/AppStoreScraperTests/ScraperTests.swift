@@ -18,5 +18,12 @@ final class ScraperTests: XCTestCase {
         let scraper = Scraper()
         let application = try await scraper.getApplication(668357845)
         XCTAssertNotNil(application)
+        XCTAssertNotNil(application?.userRatingCount)
+    }
+
+    func testGetSearchHints() async throws {
+        let scraper = Scraper()
+        let hints = try await scraper.getSearchHints("weather", country: .DE)
+        XCTAssertFalse(hints.isEmpty)
     }
 }

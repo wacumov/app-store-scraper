@@ -40,6 +40,10 @@ public struct Application: Codable {
     public let contentAdvisoryRating: String
     public let appContentRating: String
 
+    public let userRatingCount: Int?
+    public let averageUserRating: Double?
+    public let userRatingCountForCurrentVersion: Int?
+
     public enum CodingKeys: String, CodingKey {
         case id = "trackId"
         case bundleId
@@ -71,5 +75,7 @@ public struct Application: Codable {
 
         case advisories, contentAdvisoryRating
         case appContentRating = "trackContentRating"
+
+        case userRatingCount, averageUserRating, userRatingCountForCurrentVersion
     }
 }

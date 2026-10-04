@@ -6,4 +6,9 @@ final class CountryTests: XCTestCase {
         let country = Country.EE
         XCTAssertEqual(country.name, "Estonia")
     }
+
+    func testStorefrontId() {
+        XCTAssertEqual(Country.US.storefrontId, 143441)
+        XCTAssertEqual(Country.EE.storefrontId, 143518)
+    }
 }
